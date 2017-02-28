@@ -7,15 +7,26 @@
 //
 
 import UIKit
+import UserNotifications // ususally in AppDelegate.swift
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
 
     var window: UIWindow?
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
+        // Usually in application: didFinishLaunchingWithOptions
+        let center = UNUserNotificationCenter.current()
+        center.delegate = self
+        center.requestAuthorization(options: [.alert, .badge, .sound])
+        { (granted, error) in
+            // Enable or disable features based on authorization.
+            let vc = self.window?.rootViewController as! ViewController
+            vc.notifyOk = granted
+        }
         return true
     }
 
@@ -31,6 +42,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationWillEnterForeground(_ application: UIApplication) {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
+        //let vc = self.window?.rootViewController as! ViewController
+        //vc.viewDidLoad()
+        
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
@@ -41,6 +55,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
 
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void)
+    {
+        print("received notification while in foreground; display?")
+        completionHandler([.alert]) // no options ([]) means no notification
+    }
 
 }
 
